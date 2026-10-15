@@ -40,6 +40,16 @@ class Dataset:
     def _tables(self) -> dict:
         return {k: pd.read_parquet(self.root / f"{k}_scenes.parquet") for k in ("sentinel2", "landsat", "sentinel1")}
 
+    @cached_property
+    def human_labels(self) -> pd.DataFrame:
+        """One row per label (version 0.95 and later): anonymised annotator, role, blind/assisted, factual answers."""
+        return pd.read_csv(self.root / "labels" / "human_labels.csv")
+
+    @cached_property
+    def reference_labels(self) -> pd.DataFrame:
+        """One row per labelled item: consensus status, forest_2020 and deforestation (1/0, empty = undetermined), verdict."""
+        return pd.read_csv(self.root / "labels" / "reference_labels.csv")
+
     def scene_table(self, sensor: str, item_id: str | None = None) -> pd.DataFrame:
         """Per-scene records of one sensor ('sentinel2', 'landsat', 'sentinel1'), optionally for one item."""
         t = self._tables[sensor]

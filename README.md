@@ -3,7 +3,7 @@
 vEUDR is the home of a study on verifying coffee plots in Vietnam's Central Highlands against the EU Deforestation
 Regulation (EUDR, Regulation (EU) 2023/1115), and of the **EUDR-CH** benchmark dataset.
 
-**Dataset:** [EUDR-CH on Kaggle](https://www.kaggle.com/datasets/somebodyknow/eudr-ch) (CC BY 4.0) · **Paper:** *Facts First, Law in Code: Verifying
+**Dataset:** [EUDR-CH on Kaggle](https://www.kaggle.com/datasets/somebodyknow/eudr-ch) (CC BY 4.0; version 0.95 includes the interim human labels) · **Paper:** *Facts First, Law in Code: Verifying
 "Deforestation-Free" Coffee under the EU Deforestation Regulation in Vietnam's Central Highlands, with an Open
 Benchmark* (submitted to *Forests*).
 
@@ -39,9 +39,9 @@ evidence (Sentinel-2 sheets and scenes, Landsat, Sentinel-1)  ->  facts (Q1, Q2)
 | `veudr/metrics.py` | Balanced accuracy, false-green rate, exact McNemar test, block bootstrap |
 | `docs/LABELLING.md` | How to organise reference labels for EUDR verification, with the set-up of this study as an example |
 | `docs/DATASET.md` | Description of EUDR-CH (files, columns, pixel geometry, licences) |
-| `examples/` | `quickstart.py` (load, baselines, plot an item) and `make_labelling_batch.py` (draw a labelling batch) |
+| `examples/` | `quickstart.py` (load, baselines, plot an item), `score_baselines.py` (score baselines against the reference labels) and `make_labelling_batch.py` (draw a labelling batch) |
 | `research_code/` | The pipeline as used for the paper: sampling, evidence, reference sheets, the vision-language model, Whisp |
-| `scripts/build_kaggle.py` | How the Kaggle release was assembled from the study's internal files |
+| `scripts/build_kaggle.py`, `scripts/build_labels.py` | How the Kaggle release and its anonymised labels were assembled from the study's internal files |
 | `tests/` | Tests of the legal rule |
 
 The baselines and time-series features in `veudr` reproduce those of the paper exactly on the released data (all

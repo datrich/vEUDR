@@ -1,6 +1,6 @@
 # EUDR-CH: a benchmark for verifying "deforestation-free" coffee in Vietnam's Central Highlands
 
-**Version 0.9 (October 2026), without labels.** Code, documentation and the legal rule: <https://github.com/datrich/vEUDR>
+**Version 0.95 (October 2026), with interim human reference labels.** Code, documentation and the legal rule: <https://github.com/datrich/vEUDR>
 
 The EU Deforestation Regulation (EUDR, Regulation (EU) 2023/1115) admits coffee only from land that was not deforested
 after 31 December 2020. Verifying this needs two facts per plot: what the land was used for on that date, and whether
@@ -11,7 +11,7 @@ outlines in geographic and image coordinates, and features from open map product
 *Facts First, Law in Code: Verifying "Deforestation-Free" Coffee under the EU Deforestation Regulation in Vietnam's
 Central Highlands, with an Open Benchmark* (submitted).
 
-Human reference labels (blind and model-assisted, with adjudications) will be added in version 1.0.
+Interim human reference labels are included (328 labels by three annotators and 2 adjudications on 235 items, collected up to 15 October 2026); labelling continues and version 1.0 will add the final labels.
 
 ## Sample
 
@@ -38,6 +38,8 @@ Use DEV only for anything that learns from labels.
 | `sheets/interpreter/<item>.png` | Interpreter sheet: 10 Sentinel-2 median composites (true colour and false-colour NIR) on a ~1 km box, outline in yellow, with the NDVI series. Alerts: dry 2019, dry 2020, cut-off (11/2020-04/2021), 4-1 months before the alert, 0-2, 3-6, 10-14 months, 2 and 3 years after, dry 2026. Plots: dry seasons 2017-2020, cut-off, dry seasons 2022-2026 |
 | `sheets/standard/<item>.png` | Standard sheet (the one the vision-language model of the paper reads): alerts 6 windows from 12 months before to 20 months after the alert on a ~800 m box; plots 8 windows (dry 2017-2020, cut-off, 2022, 2024, 2026) on a ~600 m box |
 | `sheets/layout_<kind>.json` | Per item: box (west, south, east, north, degrees), tile size, window labels and dates, outline rings in tile pixels |
+| `labels/human_labels.csv` | One row per label: anonymised annotator, role (calibration, main, double-coded, adjudication), whether the item was labelled blind or with a model suggestion, form version (v3, v4), the factual answers (land use on 31 Dec 2020, shade trees, canopy cover, trees over 5 m, change after 2020 and its month, the v4 shares), imagery used and confidence, seconds spent |
+| `labels/reference_labels.csv` | One row per labelled item: consensus status (single, agreed, majority, adjudicated, disputed), forest on 31 Dec 2020 and deforestation (1/0, empty = undetermined), the strict variants (trees over 5 m required), change class, verdict (compliant, non-compliant, undetermined, disputed), split. Obtained with the legal rule of the code repository |
 | `scenes/<item>/` | Rendered single-date Sentinel-2 scenes (192 px JPEG, true colour `_tc` and false colour `_fc`) on the interpreter box: up to three clear scenes per year plus the scenes nearest the cut-off and the first alert; `scenes.csv` gives date, scene, clear shares, NDVI and why each was chosen |
 
 ### Pixel geometry of sheets and scenes
@@ -48,6 +50,13 @@ Each image tile covers the item centroid +- 0.0045 degrees (interpreter sheets a
 of row `r` (0 true colour, 1 false colour) and column `c` starts at `(c * 192, r * 210 + 18)`; the NDVI chart takes
 the bottom 240 pixels. The outline rings of the interpreter layout were checked against the yellow outline drawn by Earth Engine on the
 tiles.
+
+## Labels
+
+Annotators answered factual questions only; the legal conclusion is computed with `veudr.legal_rule.apply_rule`
+(code repository). Blind items (no suggestion shown) are the clean subset for scoring; assisted items showed a model
+suggestion and are affected by anchoring. Agreement between annotators is moderate for the change question (Cohen's
+kappa 0.38 on double-coded items), so treat single labels with care. Annotator identities are not released.
 
 ## Licence and sources
 
@@ -64,7 +73,7 @@ The dataset is released under **CC BY 4.0**. It is derived from:
 Not included in this version: high-resolution imagery (Google Earth, Esri Wayback; viewed by annotators, not
 redistributed), the Esri Wayback capture metadata, the official 2020 forest-status map of Vietnam and its lot
 attributes, Forest Data Partnership and Nature Trace layers, WDPA, and the GLAD and JRC forest-type layers, whose
-redistribution terms are being checked; human and model labels (version 1.0).
+redistribution terms are being checked; model labels and the suggestions shown on assisted items; annotators' free-text notes.
 
 ## Using the data
 
