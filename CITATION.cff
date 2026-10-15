@@ -6,7 +6,15 @@ date-released: 2026-10-15
 license: MIT
 repository-code: "https://github.com/datrich/vEUDR"
 authors:
-  - name: "vEUDR contributors"  # TODO: replace with the authors' names, affiliations and ORCIDs
+  - family-names: "Nguyen"
+    given-names: "Dinh Manh Linh"
+    affiliation: "SmartLab, FPT University, Vietnam"
+  - family-names: "Pham"
+    given-names: "Duy Long"
+    affiliation: "The Olympia School, Hanoi, Vietnam"
+  - family-names: "Nguyen"
+    given-names: "Duc Anh"
+    affiliation: "Foreign Language Specialized School, Hanoi, Vietnam"
 keywords:
   - EU Deforestation Regulation
   - EUDR
