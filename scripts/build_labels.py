@@ -52,8 +52,8 @@ def main():
     ap.add_argument("--out", type=Path, default=ROOT / "release/kaggle/eudr-ch/labels")
     a = ap.parse_args()
     items = pd.read_csv(ROOT / "data/processed/dossier/s1/items_s1.csv").set_index("item_id")
-    cfg = json.loads((ROOT / "annotation/vercel_app/private/config.json").read_text(encoding="utf-8"))
-    blind = set(cfg["blind"])
+    t0 = pd.read_csv(ROOT / "data/interim/dossier/legal_vlm/human_truth.csv")
+    blind = set(t0.loc[t0.che_do == "mu", "item_id"])  # blind / assisted mode recorded with each label at labelling time
     recs = []
     for uid_dir in sorted((a.src / "labels").iterdir()):
         for f in sorted((uid_dir / "items").glob("*.json")):
