@@ -1,6 +1,6 @@
 # Data licence
 
-The EUDR-CH dataset (distributed on Kaggle, not in this repository) is released under the
+The EUDR-CH dataset (distributed on Kaggle at https://www.kaggle.com/datasets/somebodyknow/eudr-ch, not in this repository) is released under the
 [Creative Commons Attribution 4.0 International licence (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 
 It is derived from the following sources, whose terms also apply:

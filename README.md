@@ -3,7 +3,7 @@
 vEUDR is the home of a study on verifying coffee plots in Vietnam's Central Highlands against the EU Deforestation
 Regulation (EUDR, Regulation (EU) 2023/1115), and of the **EUDR-CH** benchmark dataset.
 
-**Dataset:** EUDR-CH on Kaggle (link added on release) · **Paper:** *Facts First, Law in Code: Verifying
+**Dataset:** [EUDR-CH on Kaggle](https://www.kaggle.com/datasets/somebodyknow/eudr-ch) (CC BY 4.0) · **Paper:** *Facts First, Law in Code: Verifying
 "Deforestation-Free" Coffee under the EU Deforestation Regulation in Vietnam's Central Highlands, with an Open
 Benchmark* (submitted to *Forests*).
 
@@ -52,7 +52,7 @@ The baselines and time-series features in `veudr` reproduce those of the paper e
 ```bash
 pip install -r requirements.txt
 pip install -e .
-# download EUDR-CH from Kaggle into ./eudr-ch, then
+# download EUDR-CH into ./eudr-ch: kaggle datasets download somebodyknow/eudr-ch --unzip -p eudr-ch
 python examples/quickstart.py --data eudr-ch --item A1022
 pytest -q
 ```
