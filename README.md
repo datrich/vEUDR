@@ -67,13 +67,15 @@ apply_rule("natural_forest", "10_or_more", "unclear", "cleared_no_use_yet")["ver
 ## Main findings (interim, on 331 human labels)
 
 - The forest-2020 call is where map-based checks diverge. Of 60 labelled coffee plots, GFC2020 version 1 calls 75 %
-  forest in 2020, version 4 calls 15 %, annotators 43 %. A vision-language model reading the Sentinel-2 sheets reached
-  a balanced accuracy of 0.83-0.90 for this call, against 0.77-0.81 for GFC2020 V4 and 0.79-0.82 for FAO Whisp, and
-  changed 2.4 % of its calls when the map version on its evidence card was switched (46 % for a map overlay).
-- Only 26 % of alert patches on 2020 forest were converted to agriculture; 27 % were cleared with no use seen yet,
-  which the guidance treats as undetermined.
-- For the deforestation conclusion, a five-prompt ensemble and a time-series model outperformed map overlays
-  (balanced accuracy 0.72-0.74 against 0.63-0.65), on a par with a simple NDVI trajectory rule.
+  forest in 2020, version 4 calls 15 %, annotators 43 %. A vision-language model that reconciles the map sources of a
+  multi-source evidence card with the Sentinel-2 sheets reached a balanced accuracy of 0.83-0.90 for this call, against
+  0.77-0.81 for GFC2020 V4, mostly on coffee plots; switching the map version changed 2.4 % of its forest calls
+  (46 % for a map overlay).
+- Weighted to the alert population, only 23 % of alert patches on 2020 forest were converted to agriculture; 31 % were
+  cleared with no use seen yet, which the guidance treats as undetermined.
+- For the deforestation conclusion, a simple NDVI trajectory rule (0.75) and a five-prompt VLM ensemble (0.72)
+  outperformed map overlays (0.63-0.65). The preregistered primary test is not yet conclusive (four deforested items in
+  the blind test set).
 
 Numbers will be updated when labelling is complete.
 

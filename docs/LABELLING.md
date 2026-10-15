@@ -31,7 +31,7 @@ every method, so differences between methods are differences in reading the evid
 | Shade trees (if coffee) | yes; no; unclear |
 | Canopy cover in 2020 | < 10 %; >= 10 %; unclear |
 | Most trees taller than about 5 m | yes; no; unclear |
-| Q2 Change after 31 Dec 2020 | no change; converted to agriculture; plantation harvested and replanted; cleared, no use seen yet; other change, not agricultural; unclear |
+| Q2 Change after 31 Dec 2020 | no change; converted to agriculture; plantation harvested and replanted; cleared, no use seen yet; other change, not a conversion of forest; unclear |
 | Month of the change | YYYY-MM; unknown |
 | Shares (inside the outline) | canopy loss; signs of use on the cleared part; woody regrowth on the cleared part; steps of 10 % |
 | High-resolution image near the cut-off | within 2019-2021; only outside 2019-2021; none |
@@ -49,11 +49,11 @@ thresholds on the land inside the outline works better; stop at the first questi
 |---|---|---|---|
 | a | Is there a valid high-resolution image after 31 Dec 2020 (and after the loss, if any)? | no | unclear, low confidence |
 | b | Canopy loss on at least **30 %** of the outline? | no | no change (note "loss ~x %" if any) |
-| c | Was the land forest in 2020 (Q1 = natural forest or wood plantation)? | no | other change, not agricultural |
-| d | Is the cleared part mainly road, reservoir, mine or buildings? | yes | other change, not agricultural (infrastructure) |
+| c | Was the land forest in 2020 (Q1 = natural forest or wood plantation)? | no | other change, not a conversion of forest |
+| d | Is the cleared part mainly road, reservoir, mine or buildings? | yes | other change, not a conversion of forest (infrastructure) |
 | e | Crop rows, planting holes or swidden fields on at least **50 %** of the cleared part in the latest image? | yes | converted to agriculture |
 | f | Q1 = wood plantation, and the cleared part greens up evenly as one stand? | yes | plantation harvested and replanted |
-| g | Unordered woody regrowth (crowns of 2-3 m or more) on at least **50 %** of the cleared part? | yes | other change, not agricultural (regrowth) |
+| g | Unordered woody regrowth (crowns of 2-3 m or more) on at least **50 %** of the cleared part? | yes | other change, not a conversion of forest (regrowth) |
 | | | no | cleared, no use seen yet |
 
 Consistency rules (reject the answer and ask again): land that was not forest in 2020 cannot be "converted to
