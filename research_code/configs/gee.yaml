@@ -1,0 +1,78 @@
+# Earth Engine assets and parameters (Stream C). Verify asset ids at first run (src/alerts/gee_common.py check).
+project_env: GEE_PROJECT
+
+alerts:
+  integrated:
+    asset: projects/forma-250/assets/gfw_integrated_alerts/default_latest   # de-tai §4.2; last update 2026-03-25
+    # pyramiding policy is MEAN: decode codes ONLY at native resolution (~11 m), never at coarser scales
+    # GFW encoding: value = confidence_code * 10000 + days since 2014-12-31
+    # confidence_code: 2 = nominal (one system), 3 = high (>=2 systems / repeat), 4 = highest
+    epoch: "2014-12-31"
+    scale_m: 10
+  radd:
+    asset: projects/radar-wur/raddalert/v1      # ImageCollection; bands Alert (2,3), Date (yyDOY); asia updated to 2026-09
+    baseline: radd_asia_primaryhumidtropicalforest_baseline2019_v20240703
+    scale_m: 10
+  dist_alert:
+    asset: null                                  # OPERA DIST-ALERT-HLS: set when a GEE mirror is available
+    scale_m: 30
+
+forest_masks:
+  hansen: UMD/hansen/global_forest_change_2025_v1_13      # loss years 2001-2025
+  tmf_annual: projects/JRC/TMF/v1_2024/AnnualChanges
+  tmf_transition: projects/JRC/TMF/v1_2024/TransitionMap_Subtypes
+  primary_humid_tropics: UMD/GLAD/PRIMARY_HUMID_TROPICAL_FORESTS/v1
+  treecover_min: 30
+  # JRC TMF TransitionMap_Subtypes legend (TMF Data Users Guide): 41 forest->tree plantation,
+  # 42 forest->water (dams), 43 forest->other land (agriculture, infrastructure, mining),
+  # 91-93 other land / afforestation incl. plantations on non-forest. Verified 03/10/2026 on
+  # known acacia areas (91-93 ~ 33 %, 81-86 absent).
+  tmf_plantation_codes: [41, 91, 92, 93]
+  tmf_water_codes: [42]
+  tmf_other_land_codes: [43]
+
+imagery:
+  s2_sr: COPERNICUS/S2_SR_HARMONIZED
+  s2_cloud_prob: COPERNICUS/S2_CLOUD_PROBABILITY
+  s1: COPERNICUS/S1_GRD
+  landsat: [LANDSAT/LT05/C02/T1_L2, LANDSAT/LE07/C02/T1_L2, LANDSAT/LC08/C02/T1_L2, LANDSAT/LC09/C02/T1_L2]
+  modis_ndvi: MODIS/061/MOD13Q1
+
+context:
+  firms: FIRMS
+  chirps: UCSB-CHG/CHIRPS/DAILY
+  era5_land: ECMWF/ERA5_LAND/DAILY_AGGR
+  dem: COPERNICUS/DEM/GLO30
+  worldpop: WorldPop/GP/100m/pop
+  ghs_pop: JRC/GHSL/P2023A/GHS_POP
+  ghs_built: JRC/GHSL/P2023A/GHS_BUILT_S
+  viirs: NOAA/VIIRS/DNB/ANNUAL_V22                  # 2022-2025 only
+  viirs_v21: NOAA/VIIRS/DNB/ANNUAL_V21              # 2012-2021
+  dmsp: NOAA/DMSP-OLS/NIGHTTIME_LIGHTS
+  travel_time: Oxford/MAP/accessibility_to_cities_2015_v1_0
+  wdpa: WCMC/WDPA/current/polygons
+  # added 03/10/2026 to separate C1/C2/C4/C5 (all verified on GEE)
+  jrc_gfc2020_subtypes: JRC/GFC2020_subtypes/V1     # Map: 1 naturally regenerating, 10 primary, 20 planted
+  dynamic_world: GOOGLE/DYNAMICWORLD/V1             # 10 m class probabilities, 2015+
+  worldcover: ESA/WorldCover/v200
+  modis_burned: MODIS/061/MCD64A1                   # BurnDate (day of year), monthly
+  mining_polygons: projects/sat-io/open-datasets/global-mining/global_mining_polygons
+  goodd_dams: projects/sat-io/open-datasets/GOODD/GOOD2_dams
+  gfw_drivers_1km: null   # comparison only: correct asset id still to be found (old guess did not exist)
+
+patches:
+  time_bin_days: 90          # pixels alerted within the same 90-day bin and 8-connected form one patch
+  min_pixels: 10             # 10 px at 10 m = 0.1 ha
+  tile_deg: 0.5
+  windows:
+    pre_days: [180, 30]      # pre-disturbance composite: 180..30 days before first alert
+    post_days: [0, 60]
+    recovery_months: [3, 6, 12]
+  firms_days: 7
+  firms_buffer_m: 1000
+  pop_buffer_m: [1000, 5000]
+
+gfw_api:   # downloaded with src/alerts/gfw_api.py (needs GFW_API_KEY); version null = latest
+  wri_google_tree_cover_loss_drivers: {pixel_meanings: [category], grid: "10/40000", version: v1.13}
+  umd_glad_dist_alerts: {pixel_meanings: [date_conf], grid: "10/40000", version: null}
+  gfw_integrated_alerts: {pixel_meanings: [date_conf], grid: "10/100000", version: null}   # verified 04/10/2026

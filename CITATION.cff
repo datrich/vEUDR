@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this code or the EUDR-CH dataset, please cite it as below."
+title: "vEUDR: verifying EUDR deforestation-free claims, facts first and law in code"
+version: 0.9.0
+date-released: 2026-10-15
+license: MIT
+repository-code: "https://github.com/datrich/vEUDR"
+authors:
+  - name: "vEUDR contributors"  # TODO: replace with the authors' names, affiliations and ORCIDs
+keywords:
+  - EU Deforestation Regulation
+  - EUDR
+  - coffee
+  - remote sensing
+  - Sentinel-2
+  - vision-language model
+  - Vietnam
