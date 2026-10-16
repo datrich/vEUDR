@@ -91,7 +91,11 @@ ts_cols = [c for c in F.columns if c.startswith(("s2_", "ls_", "s1_"))] + ["is_a
 map_cols = [c for c in F.columns if c.startswith("map_")]
 y2 = t[t.y2.notna()].y2.astype(int)
 split = meta.loc[y2.index, "split"]
-dev, test = y2[split == "dev"], y2[split == "test"]
+test = y2[split == "test"]  # scored on the current reference (person labels)
+# trained on the DEV items of the full 1000-item reference: person DEV labels are too few (38 items, 5 deforested)
+ta = pd.read_csv(ROOT / "data/interim/dossier/legal_vlm/human_truth_all1000.csv").set_index("item_id")
+ta = ta[ta.index.isin(meta.index) & ta.y2.notna()]
+dev = ta.y2.astype(int)[meta.loc[ta.index, "split"] == "dev"]
 res["supervised"] = {"n_dev": int(len(dev)), "pos_dev": int(dev.sum()), "n_test": int(len(test)), "pos_test": int(test.sum())}
 bt = test[test.index.isin(blind)]
 for name, cols in (("ts_only", ts_cols), ("ts_maps", ts_cols + map_cols)):
@@ -122,6 +126,7 @@ for m in ("S1_ensemble", "ndvi_rule", "all_alerts", "gfcV4_hansen"):
 
 # ---- B5: forest-2020 calls by reference land-use class
 lab = pd.read_csv(ROOT / "release/kaggle/eudr-ch/labels/labels.csv")
+lab = lab[lab.label_source.str.startswith("human")]  # land-use class from the person labels (and person adjudications)
 adj = lab[lab.role == "adjudication"].groupby("item_id").land_use_2020.first()
 maj = lab[lab.role != "adjudication"].groupby("item_id").land_use_2020.agg(lambda s: s.mode().iloc[0])
 land = adj.combine_first(maj)

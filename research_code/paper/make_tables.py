@@ -20,7 +20,7 @@ GROUPS = [
         ("gfcV4_hansen", "GFC2020 V4 + Hansen loss"), ("gfcV1_hansen", "GFC2020 V1 + Hansen loss"),
         ("national_loss", "National 2020 map + loss"), ("whisp_fao", "Whisp (FAO), official"),
         ("gfw_drivers", "GFC2020 V4 + loss + drivers map"), ("tmf_loss", "JRC TMF"), ("dw_conversion", "Dynamic World"),
-        ("all_alerts", "Every alert is deforestation")]),
+        ("all_alerts", "Every alert (plots: Hansen loss)")]),
     ("Rules and learning on the same evidence", [
         ("ndvi_rule", "NDVI trajectory rule"), ("rules_legal", "Legal rules on the evidence card"),
         ("lgbm_dev", "LightGBM on card features (DEV)")]),
@@ -113,8 +113,8 @@ def main():
     OUT.mkdir(exist_ok=True)
     note_common = (r"Balanced accuracy is the mean of sensitivity and specificity; items a method leaves uncertain are excluded for that method "
                    r"(coverage $\geq$0.89 for every method; scores with uncertain counted as wrong are given in the text). Best value in the All "
-                   r"and TEST columns in bold; the blind columns rest on few positive items and are not ranked. Reference labels (person and model labels, Table~\ref{tab:bysource}) of "
-                   r"\labelsdate{}, after adjudication; blind items carry no model suggestion.")
+                   r"and TEST columns in bold; the blind columns rest on few positive items and are not ranked. Person reference labels "
+                   r"(the 1000-item reference with model labels: Supplementary Material S7); blind items carry no model suggestion.")
     t1 = table("y1", [("all", r"\textbf{All}", "BA"), ("test", r"\textbf{TEST}", "BA"), ("blind", r"\textbf{Blind}", "BA"),
                       ("blind_test", r"\textbf{Blind TEST}", "BA"), ("all:sensitivity", r"\textbf{All}", "Sens."),
                       ("all:specificity", r"\textbf{All}", "Spec.")],

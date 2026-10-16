@@ -4,7 +4,7 @@
 
 Reads the raw records pulled from the labelling site (human_labels.pull_web) and the reference labels of
 src/dossier/human_labels.py (data/interim/dossier/legal_vlm/human_truth.csv). Annotator accounts are replaced by
-annotator_1..4 and adjudicator; free-text notes, timestamps, image dates typed by annotators and the model
+annotator_1..3 and adjudicator (model labels: annotator model_claude-opus-5-5); free-text notes, timestamps, image dates typed by annotators and the model
 suggestions shown on assisted items are left out. Items outside the s1 sample (pilot trial labels) are dropped.
 The source of every label (person or model) comes from data/goi_gan_nhan/phan_tich/label_source.csv
 (src.release.label_source); the time of model labels is the run time of the script and is left out.
@@ -69,7 +69,7 @@ def main():
         if r["ma_diem"] not in items.index:
             continue
         rows.append({
-            "item_id": r["ma_diem"], "label_source": SRC[(uid, r["ma_diem"])], "annotator": ANON[uid], "role": ROLE[r.get("vai_tro", "phan_xu" if uid == "admin" else "chinh")],
+            "item_id": r["ma_diem"], "label_source": SRC[(uid, r["ma_diem"])], "annotator": "model_claude-opus-5-5" if SRC[(uid, r["ma_diem"])].startswith("model") else ANON[uid], "role": ROLE[r.get("vai_tro", "phan_xu" if uid == "admin" else "chinh")],
             "item_mode": "blind" if r["ma_diem"] in blind else "assisted", "form_version": form(r.get("phien_ban_huong_dan", "")),
             "land_use_2020": LAND[r["su_dung_dat_2020"]], "shade_trees": YNU.get(r.get("cay_che_bong", ""), ""),
             "canopy_2020": CANOPY[r["do_che_phu_2020"]], "trees_over_5m": YNU[r["cay_cao_tren_5m"]],
@@ -83,23 +83,28 @@ def main():
     a.out.mkdir(parents=True, exist_ok=True)
     (a.out / "human_labels.csv").unlink(missing_ok=True)  # name of versions <= 0.95
     lab.to_csv(a.out / "labels.csv", index=False)
-    t = pd.read_csv(ROOT / "data/interim/dossier/legal_vlm/human_truth.csv")
-    t = t[t.item_id.isin(items.index)]
-    ref = pd.DataFrame({
-        "item_id": t.item_id, "kind": t.kind, "status": t.status, "n_labels": t.n_labels,
-        "item_mode": ["blind" if i in blind else "assisted" for i in t.item_id], "form_version": t.phieu,
-        "calibration_item": t.calibration.astype(bool), "forest_2020": t.y1.astype("Int64"), "deforestation": t.y2.astype("Int64"),
-        "forest_2020_strict": t.y1_strict.astype("Int64"), "deforestation_strict": t.y2_strict.astype("Int64"),
-        "change_class": t.cause.map(CAUSE), "confidence": t.conf,
-        "split": items.loc[t.item_id, "split"].values})
     person = set(lab.loc[lab.label_source == "human", "item_id"])
     model = set(lab.loc[lab.label_source.str.startswith("model"), "item_id"])
-    ref["label_sources"] = ["person_and_model" if i in person and i in model else "person" if i in person else "model" for i in t.item_id]
-    ref["verdict"] = ref.deforestation.map({1: "non_compliant", 0: "compliant"}).fillna("undetermined")
-    ref.loc[ref.status == "disputed", "verdict"] = "disputed"
-    ref.to_csv(a.out / "reference_labels.csv", index=False)
+    # main reference: person labels only (human_truth.csv); the 1000-item reference with model labels is released apart
+    refs = {}
+    for name, truth in (("reference_labels.csv", "human_truth.csv"), ("reference_labels_all1000.csv", "human_truth_all1000.csv")):
+        t = pd.read_csv(ROOT / "data/interim/dossier/legal_vlm" / truth)
+        t = t[t.item_id.isin(items.index)]
+        ref = pd.DataFrame({
+            "item_id": t.item_id, "kind": t.kind, "status": t.status, "n_labels": t.n_labels,
+            "item_mode": ["blind" if i in blind else "assisted" for i in t.item_id], "form_version": t.phieu,
+            "calibration_item": t.calibration.astype(bool), "forest_2020": t.y1.astype("Int64"), "deforestation": t.y2.astype("Int64"),
+            "forest_2020_strict": t.y1_strict.astype("Int64"), "deforestation_strict": t.y2_strict.astype("Int64"),
+            "change_class": t.cause.map(CAUSE), "confidence": t.conf,
+            "split": items.loc[t.item_id, "split"].values})
+        ref["label_sources"] = ["person_and_model" if i in person and i in model else "person" if i in person else "model" for i in t.item_id]
+        ref["verdict"] = ref.deforestation.map({1: "non_compliant", 0: "compliant"}).fillna("undetermined")
+        ref.loc[ref.status == "disputed", "verdict"] = "disputed"
+        ref.to_csv(a.out / name, index=False)
+        refs[name] = ref
+    ref = refs["reference_labels.csv"]
     print(f"labels: {len(lab)} rows on {lab.item_id.nunique()} items ({lab.label_source.value_counts().to_dict()}); "
-          f"reference: {len(ref)} items, {ref.verdict.value_counts().to_dict()} -> {a.out}")
+          f"reference (person): {len(ref)} items, {ref.verdict.value_counts().to_dict()}; reference (1000): {len(refs['reference_labels_all1000.csv'])} items -> {a.out}")
 
 
 if __name__ == "__main__":

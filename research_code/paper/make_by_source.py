@@ -31,7 +31,7 @@ src = pd.read_csv(ROOT / "data/goi_gan_nhan/phan_tich/label_source.csv")
 items = pd.read_csv(ROOT / "data/processed/dossier/s1/items_s1.csv").set_index("item_id")
 lab = src[src.account != "admin"]
 person_items = set(lab[lab.source == "human"].item_id)
-t = pd.read_csv(L / "human_truth.csv")
+t = pd.read_csv(L / "human_truth_all1000.csv")  # the full 1000-item reference (person and model labels)
 t[~t.item_id.isin(person_items)].to_csv(L / "human_truth_modelonly.csv", index=False)
 
 
@@ -44,6 +44,7 @@ def score(truth, tag):
 
 score(L / "human_truth_person.csv", "person")
 score(L / "human_truth_modelonly.csv", "modelonly")
+score(L / "human_truth_all1000.csv", "all1000")
 subprocess.run([sys.executable, "-m", "src.dossier.score_round"], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 
 # agreement: model vs person on items with both, person vs person on items with two person labels
@@ -83,10 +84,10 @@ print(json.dumps(res, indent=1))
 
 # table: main methods on the three references
 M = [("S1_ensemble", "VLM, five-prompt ensemble (S1)"), ("vlm_v2vi", "VLM, single prompt"), ("ndvi_rule", "NDVI trajectory rule"),
-     ("all_alerts", "Every alert is deforestation"), ("rules_legal", "Legal rules on the card"), ("gfcV4_hansen", "GFC2020 V4 + Hansen loss"),
+     ("all_alerts", "Every alert (plots: Hansen loss)"), ("rules_legal", "Legal rules on the card"), ("gfcV4_hansen", "GFC2020 V4 + Hansen loss"),
      ("gfcV1_hansen", "GFC2020 V1 + Hansen loss"), ("national_loss", "National 2020 map + loss"), ("whisp_fao", "Whisp (FAO), official")]
 reps = {tag: json.loads((RUNS / f"score_round_report{s}.json").read_text(encoding="utf-8"))["sets"]["all"]
-        for tag, s in (("all", ""), ("person", "_person"), ("model", "_modelonly"))}
+        for tag, s in (("all", "_all1000"), ("person", "_person"), ("model", "_modelonly"))}
 
 
 def cell(tag, y, k):
@@ -104,7 +105,7 @@ Lt = [r"\begin{table}[H]",
       r"\caption{Balanced accuracy by source of the reference labels (all items of each reference). \emph{Person}: consensus of the "
       r"labels entered by people only (items without a person label, and items on which people disagree, left out); \emph{model only}: "
       r"items labelled only by Claude Opus~5.5 (zero-shot, labelling guide v4), with person adjudication of disagreements; "
-      r"\emph{all}: every label, as in the other tables.\label{tab:bysource}}",
+      r"\emph{all}: every label, the 1000-item reference of Supplementary Material S7. The other tables use the person labels.\label{tab:bysource}}",
       r"\begin{adjustwidth}{-\extralength}{0cm}", r"\newcolumntype{C}{>{\centering\arraybackslash}X}",
       r"\begin{tabularx}{\fulllength}{lCCCCCC}", r"\toprule",
       r" & \multicolumn{3}{c}{\textbf{Forest 2020}} & \multicolumn{3}{c}{\textbf{Deforestation}}\\",
