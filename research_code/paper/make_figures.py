@@ -148,7 +148,7 @@ def forest2020(rep):
     ax.axvline(0.5, color="#bdbdbd", lw=0.6, ls=":")
     ax.set_xlim(0.4, 1.0), ax.set_xlabel("Balanced accuracy, forest on 31 Dec 2020")
     ax.legend(loc="lower right", fontsize=6, handletextpad=0.2, borderaxespad=0.1)
-    ax.set_title("(a) Forest-2020 call against reference labels", fontsize=7.5, loc="left")
+    ax.set_title("(a) Forest-2020 call against person labels", fontsize=7.5, loc="left")
     # (b) share of labelled coffee plots called forest in 2020
     t = truth()
     p = t[(t.kind == "plot") & t.y1.notna()].set_index("item_id")

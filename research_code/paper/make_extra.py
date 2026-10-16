@@ -268,9 +268,11 @@ def write_tables(res):
     L = [r"\begin{table}[H]",
          r"\caption{Results by item kind, all labels: balanced accuracy (sensitivity/specificity). Alert patches are mostly forest in 2020 "
          rf"(forest 2020: {nk['y1_alert'][1]} of {nk['y1_alert'][0]}), plots mostly not ({nk['y1_plot'][1]} of {nk['y1_plot'][0]}). "
-         rf"Deforestation is scored on alerts ($n={nk['y2_alert'][0]}$, {nk['y2_alert'][1]} deforested); of the {nk['y2_plot'][0]} plots with a "
-         rf"determined conclusion only {nk['y2_plot'][1]} were deforested, so for plots the share of the {nk['y2_plot'][0] - nk['y2_plot'][1]} "
-         rf"plots not deforested that is wrongly called deforested is given.\label{{tab:bykind}}}}",
+         rf"Deforestation is scored on alerts ($n={nk['y2_alert'][0]}$, {nk['y2_alert'][1]} deforested); "
+         + (rf"none of the {nk['y2_plot'][0]} plots with a determined conclusion was deforested, so for plots the share wrongly called "
+            rf"deforested is given.\label{{tab:bykind}}}}" if nk['y2_plot'][1] == 0 else
+            rf"of the {nk['y2_plot'][0]} plots with a determined conclusion only {nk['y2_plot'][1]} were deforested, so for plots the share of "
+            rf"the {nk['y2_plot'][0] - nk['y2_plot'][1]} plots not deforested that is wrongly called deforested is given.\label{{tab:bykind}}}}"),
          r"\begin{adjustwidth}{-\extralength}{0cm}", r"\newcolumntype{C}{>{\centering\arraybackslash}X}",
          r"\begin{tabularx}{\fulllength}{lCCCC}", r"\toprule",
          r"\textbf{Method} & \textbf{Forest 2020, alerts} & \textbf{Forest 2020, plots} & \textbf{Deforestation, alerts} & \textbf{Plots called deforested}\\",
