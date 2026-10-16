@@ -1,6 +1,6 @@
 # EUDR-CH: a benchmark for verifying "deforestation-free" coffee in Vietnam's Central Highlands
 
-**Version 0.95 (October 2026), with interim human reference labels.** Code, documentation and the legal rule: <https://github.com/datrich/vEUDR>
+**Version 0.96 (October 2026), with reference labels on the full labelling batch: person labels and model labels, each marked with its source.** Code, documentation and the legal rule: <https://github.com/datrich/vEUDR>
 
 The EU Deforestation Regulation (EUDR, Regulation (EU) 2023/1115) admits coffee only from land that was not deforested
 after 31 December 2020. Verifying this needs two facts per plot: what the land was used for on that date, and whether
@@ -11,7 +11,7 @@ outlines in geographic and image coordinates, and features from open map product
 *Facts First, Law in Code: Verifying "Deforestation-Free" Coffee under the EU Deforestation Regulation in Vietnam's
 Central Highlands, with an Open Benchmark* (submitted).
 
-Interim human reference labels are included (328 labels by three annotators and 2 adjudications on 235 items, collected up to 15 October 2026); labelling continues and version 1.0 will add the final labels.
+Reference labels are included for all 1000 items of the labelling batch: 328 labels entered by three annotators (235 items, up to 15 October 2026), 975 labels produced by a multimodal model (Claude Opus 5.5, zero-shot, following labelling guide v4 and given the same imagery as the annotators) and 67 adjudications by a person (65 of them approving a proposal of a second model, Claude Fable 5). The column `label_source` gives the source of every label; `reference_labels.csv` gives, per item, whether the reference rests on person labels, model labels or both. Version 0.95 contained the person labels only.
 
 ## Sample
 
@@ -38,7 +38,7 @@ Use DEV only for anything that learns from labels.
 | `sheets/interpreter/<item>.png` | Interpreter sheet: 10 Sentinel-2 median composites (true colour and false-colour NIR) on a ~1 km box, outline in yellow, with the NDVI series. Alerts: dry 2019, dry 2020, cut-off (11/2020-04/2021), 4-1 months before the alert, 0-2, 3-6, 10-14 months, 2 and 3 years after, dry 2026. Plots: dry seasons 2017-2020, cut-off, dry seasons 2022-2026 |
 | `sheets/standard/<item>.png` | Standard sheet (the one the vision-language model of the paper reads): alerts 6 windows from 12 months before to 20 months after the alert on a ~800 m box; plots 8 windows (dry 2017-2020, cut-off, 2022, 2024, 2026) on a ~600 m box |
 | `sheets/layout_<kind>.json` | Per item: box (west, south, east, north, degrees), tile size, window labels and dates, outline rings in tile pixels |
-| `labels/human_labels.csv` | One row per label: anonymised annotator, role (calibration, main, double-coded, adjudication), whether the item was labelled blind or with a model suggestion, form version (v3, v4), the factual answers (land use on 31 Dec 2020, shade trees, canopy cover, trees over 5 m, change after 2020 and its month, the v4 shares), imagery used and confidence, seconds spent |
+| `labels/labels.csv` | One row per label: source (`human`, `model_claude-opus-5-5`, `human_adjudication`, `human_adjudication_of_model_proposal`), anonymised annotator, role (calibration, main, double-coded, adjudication), whether the item was labelled blind or with a model suggestion, form version (v3, v4), the factual answers (land use on 31 Dec 2020, shade trees, canopy cover, trees over 5 m, change after 2020 and its month, the v4 shares), imagery used and confidence, seconds spent |
 | `labels/reference_labels.csv` | One row per labelled item: consensus status (single, agreed, majority, adjudicated, disputed), forest on 31 Dec 2020 and deforestation (1/0, empty = undetermined), the strict variants (trees over 5 m required), change class, verdict (compliant, non-compliant, undetermined, disputed), split. Obtained with the legal rule of the code repository |
 | `scenes/<item>/` | Rendered single-date Sentinel-2 scenes (192 px JPEG, true colour `_tc` and false colour `_fc`) on the interpreter box: up to three clear scenes per year plus the scenes nearest the cut-off and the first alert; `scenes.csv` gives date, scene, clear shares, NDVI and why each was chosen |
 
@@ -55,8 +55,9 @@ tiles.
 
 Annotators answered factual questions only; the legal conclusion is computed with `veudr.legal_rule.apply_rule`
 (code repository). Blind items (no suggestion shown) are the clean subset for scoring; assisted items showed a model
-suggestion and are affected by anchoring. Agreement between annotators is moderate for the change question (Cohen's
-kappa 0.38 on double-coded items), so treat single labels with care. Annotator identities are not released.
+suggestion and are affected by anchoring. Between people, Cohen's kappa on 33 double-coded items is 0.46 for the
+forest-2020 status, 0.38 for the change class and 0.34 for the deforestation conclusion; between model and person labels on 44
+items it is 0.76, 0.51 and 0.63 (26 items). Most assisted items carry a single label; `seconds` is empty for model labels. Annotator identities are not released.
 
 ## Licence and sources
 

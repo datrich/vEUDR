@@ -41,9 +41,17 @@ class Dataset:
         return {k: pd.read_parquet(self.root / f"{k}_scenes.parquet") for k in ("sentinel2", "landsat", "sentinel1")}
 
     @cached_property
+    def labels(self) -> pd.DataFrame:
+        """One row per label: source (person or model; version 0.96 and later), anonymised annotator, role,
+        blind/assisted, factual answers. Version 0.95 shipped person labels only, as labels/human_labels.csv."""
+        f = self.root / "labels" / "labels.csv"
+        return pd.read_csv(f if f.exists() else self.root / "labels" / "human_labels.csv")
+
+    @cached_property
     def human_labels(self) -> pd.DataFrame:
-        """One row per label (version 0.95 and later): anonymised annotator, role, blind/assisted, factual answers."""
-        return pd.read_csv(self.root / "labels" / "human_labels.csv")
+        """Labels entered by people (adjudications included)."""
+        lab = self.labels
+        return lab if "label_source" not in lab else lab[lab.label_source.str.startswith("human")].reset_index(drop=True)
 
     @cached_property
     def reference_labels(self) -> pd.DataFrame:

@@ -1,11 +1,13 @@
-"""Human reference labels for the public EUDR-CH dataset (version 0.95): anonymised, English codes, no free text.
+"""Labels and reference labels for the public EUDR-CH dataset (version 0.96): anonymised, English codes, no free text.
 
-    .venv/Scripts/python -m src.release.build_labels [--src data/goi_gan_nhan/_cache/nhan_web_new] [--out release/kaggle/eudr-ch/labels]
+    .venv/Scripts/python -m src.release.build_labels [--src data/goi_gan_nhan/_cache/nhan_web_adj16oct] [--out release/kaggle/eudr-ch/labels]
 
 Reads the raw records pulled from the labelling site (human_labels.pull_web) and the reference labels of
 src/dossier/human_labels.py (data/interim/dossier/legal_vlm/human_truth.csv). Annotator accounts are replaced by
-annotator_1..3 and adjudicator; free-text notes, timestamps, image dates typed by annotators and the model
+annotator_1..4 and adjudicator; free-text notes, timestamps, image dates typed by annotators and the model
 suggestions shown on assisted items are left out. Items outside the s1 sample (pilot trial labels) are dropped.
+The source of every label (person or model) comes from data/goi_gan_nhan/phan_tich/label_source.csv
+(src.release.label_source); the time of model labels is the run time of the script and is left out.
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ os.environ.setdefault("DOSSIER_SET", "s1")
 import pandas as pd  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
-ANON = {"a1": "annotator_1", "a3": "annotator_2", "a4": "annotator_3", "admin": "adjudicator"}
+ANON = {"a1": "annotator_1", "a3": "annotator_2", "a4": "annotator_3", "a2": "annotator_4", "admin": "adjudicator"}
 LAND = {"rừng_tự_nhiên": "natural_forest", "rừng_trồng_lấy_gỗ": "wood_plantation", "cà_phê_hoặc_nông_lâm_kết_hợp": "coffee_or_agroforestry",
         "cây_lâu_năm_khác": "other_perennial_crop", "cây_hằng_năm_hoặc_đất_trống": "annual_crop_or_bare", "xây_dựng_hoặc_mặt_nước": "built_up_or_water",
         "không_rõ": "unclear"}
@@ -48,7 +50,7 @@ def month(v: str) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", type=Path, default=ROOT / "data/goi_gan_nhan/_cache/nhan_web_new")
+    ap.add_argument("--src", type=Path, default=ROOT / "data/goi_gan_nhan/_cache/nhan_web_adj16oct")
     ap.add_argument("--out", type=Path, default=ROOT / "release/kaggle/eudr-ch/labels")
     a = ap.parse_args()
     items = pd.read_csv(ROOT / "data/processed/dossier/s1/items_s1.csv").set_index("item_id")
@@ -60,12 +62,14 @@ def main():
             recs.append((uid_dir.name, json.loads(f.read_text(encoding="utf-8"))))
     for f in sorted((a.src / "adjudicated").glob("*.json")):
         recs.append(("admin", json.loads(f.read_text(encoding="utf-8"))))
+    src = pd.read_csv(ROOT / "data/goi_gan_nhan/phan_tich/label_source.csv")
+    SRC = {(a_, i_): s_ for a_, i_, s_ in zip(src.account, src.item_id, src.source)}
     rows = []
     for uid, r in recs:
         if r["ma_diem"] not in items.index:
             continue
         rows.append({
-            "item_id": r["ma_diem"], "annotator": ANON[uid], "role": ROLE[r.get("vai_tro", "phan_xu" if uid == "admin" else "chinh")],
+            "item_id": r["ma_diem"], "label_source": SRC[(uid, r["ma_diem"])], "annotator": ANON[uid], "role": ROLE[r.get("vai_tro", "phan_xu" if uid == "admin" else "chinh")],
             "item_mode": "blind" if r["ma_diem"] in blind else "assisted", "form_version": form(r.get("phien_ban_huong_dan", "")),
             "land_use_2020": LAND[r["su_dung_dat_2020"]], "shade_trees": YNU.get(r.get("cay_che_bong", ""), ""),
             "canopy_2020": CANOPY[r["do_che_phu_2020"]], "trees_over_5m": YNU[r["cay_cao_tren_5m"]],
@@ -73,10 +77,12 @@ def main():
             "share_canopy_loss": r.get("ty_le_mat_tan", ""), "share_signs_of_use": r.get("ty_le_su_dung", ""),
             "share_woody_regrowth": r.get("ty_le_tai_sinh", ""),
             "hr_image_near_cutoff": HR.get(r.get("anh_gan_2020", ""), ""), "latest_image_year": LATEST.get(r.get("nam_anh_moi_nhat", ""), ""),
-            "confidence": CONF.get(r.get("do_tin_cay", ""), ""), "seconds": r.get("so_giay", "")})
+            "confidence": CONF.get(r.get("do_tin_cay", ""), ""),
+            "seconds": "" if SRC[(uid, r["ma_diem"])].startswith("model") else r.get("so_giay", "")})
     lab = pd.DataFrame(rows).sort_values(["item_id", "role", "annotator"])
     a.out.mkdir(parents=True, exist_ok=True)
-    lab.to_csv(a.out / "human_labels.csv", index=False)
+    (a.out / "human_labels.csv").unlink(missing_ok=True)  # name of versions <= 0.95
+    lab.to_csv(a.out / "labels.csv", index=False)
     t = pd.read_csv(ROOT / "data/interim/dossier/legal_vlm/human_truth.csv")
     t = t[t.item_id.isin(items.index)]
     ref = pd.DataFrame({
@@ -86,10 +92,13 @@ def main():
         "forest_2020_strict": t.y1_strict.astype("Int64"), "deforestation_strict": t.y2_strict.astype("Int64"),
         "change_class": t.cause.map(CAUSE), "confidence": t.conf,
         "split": items.loc[t.item_id, "split"].values})
+    person = set(lab.loc[lab.label_source == "human", "item_id"])
+    model = set(lab.loc[lab.label_source.str.startswith("model"), "item_id"])
+    ref["label_sources"] = ["person_and_model" if i in person and i in model else "person" if i in person else "model" for i in t.item_id]
     ref["verdict"] = ref.deforestation.map({1: "non_compliant", 0: "compliant"}).fillna("undetermined")
     ref.loc[ref.status == "disputed", "verdict"] = "disputed"
     ref.to_csv(a.out / "reference_labels.csv", index=False)
-    print(f"labels: {len(lab)} rows on {lab.item_id.nunique()} items ({lab.annotator.value_counts().to_dict()}); "
+    print(f"labels: {len(lab)} rows on {lab.item_id.nunique()} items ({lab.label_source.value_counts().to_dict()}); "
           f"reference: {len(ref)} items, {ref.verdict.value_counts().to_dict()} -> {a.out}")
 
 

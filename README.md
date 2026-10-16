@@ -3,7 +3,7 @@
 vEUDR is the home of a study on verifying coffee plots in Vietnam's Central Highlands against the EU Deforestation
 Regulation (EUDR, Regulation (EU) 2023/1115), and of the **EUDR-CH** benchmark dataset.
 
-**Dataset:** [EUDR-CH on Kaggle](https://www.kaggle.com/datasets/somebodyknow/eudr-ch) (CC BY 4.0; version 0.95 includes the interim human labels) · **Paper:** *Facts First, Law in Code: Verifying
+**Dataset:** [EUDR-CH on Kaggle](https://www.kaggle.com/datasets/somebodyknow/eudr-ch) (CC BY 4.0; version 0.96 includes reference labels for all 1000 items of the labelling batch, person and model labels marked by source) · **Paper:** *Facts First, Law in Code: Verifying
 "Deforestation-Free" Coffee under the EU Deforestation Regulation in Vietnam's Central Highlands, with an Open
 Benchmark* (submitted to *Forests*).
 
@@ -64,20 +64,23 @@ apply_rule("wood_plantation", "10_or_more", "yes", "plantation_harvested_and_rep
 apply_rule("natural_forest", "10_or_more", "unclear", "cleared_no_use_yet")["verdict"]       # 'undetermined'
 ```
 
-## Main findings (interim, on 331 human labels)
+## Main findings (1000 items; 328 person labels and 975 model labels, with person adjudication)
 
-- The forest-2020 call is where map-based checks diverge. Of 60 labelled coffee plots, GFC2020 version 1 calls 75 %
-  forest in 2020, version 4 calls 15 %, annotators 43 %. A vision-language model that reconciles the map sources of a
-  multi-source evidence card with the Sentinel-2 sheets reached a balanced accuracy of 0.83-0.90 for this call, against
-  0.77-0.81 for GFC2020 V4, mostly on coffee plots; switching the map version changed 2.4 % of its forest calls
-  (46 % for a map overlay).
-- Weighted to the alert population, only 23 % of alert patches on 2020 forest were converted to agriculture; 31 % were
+- The forest-2020 call is where map-based checks diverge. Of 294 coffee plots, GFC2020 version 1 calls 78 % forest in
+  2020, version 4 calls 22 %, the reference labels 50 %. A vision-language model that reconciles the map sources of a
+  multi-source evidence card with the Sentinel-2 sheets reached a balanced accuracy of 0.82-0.86 for this call (five-prompt
+  ensemble; 0.87 on the person labels alone), against 0.75-0.77 for GFC2020 V4, mostly on coffee plots; switching the map
+  version changed 2.4 % of its forest calls (46 % for a map overlay).
+- Weighted to the alert population, only 16 % of alert patches on 2020 forest were converted to agriculture; 39 % were
   cleared with no use seen yet, which the guidance treats as undetermined.
-- For the deforestation conclusion, a simple NDVI trajectory rule (0.75) and a five-prompt VLM ensemble (0.72)
-  outperformed map overlays (0.63-0.65). The preregistered primary test is not yet conclusive (four deforested items in
-  the blind test set).
-
-Numbers will be updated when labelling is complete.
+- The deforestation conclusion is hard for every method: on all labels the best training-free methods (NDVI trajectory
+  rule and five-prompt VLM ensemble, both 0.68) do not differ significantly from calling every alert deforestation (0.66).
+  On the person labels alone they do better (0.75 and 0.72 against 0.65).
+- The preregistered primary test (single-prompt VLM against GFC2020 V4 + Hansen loss on 152 blind test items, 17
+  deforested) is mixed: higher accuracy (0.80 against 0.74, McNemar p = 0.18, not significant) and fewer false greens
+  (5.8 % against 8.7 %).
+- Model labels (Claude Opus 5.5 following the labelling guide) agreed with person labels about as well as two people agreed
+  with each other on the facts (kappa 0.76 for forest 2020 on 44 items), but less well on the deforestation conclusion.
 
 ## Licences
 
