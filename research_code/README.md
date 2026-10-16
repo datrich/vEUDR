@@ -16,6 +16,7 @@ can be checked. Comments and prompts are partly in Vietnamese. Paths are relativ
 | `src/dossier/human_labels.py` | The frozen legal rule (`law`, SHA-256 prefix 22f32e93bb5b640d) and Cohen's kappa |
 | `src/dossier/hybrid_ts_vlm.py` | Time-series features, the exploratory model E1, McNemar and block-bootstrap helpers |
 | `src/dossier/score_round.py` | Scoring of all methods on the four label sets (all, TEST, blind, blind TEST) |
+| `src/dossier/c2_local.py` | Confirmatory run C2: the VLM answers the person form (Ollama, local GPU) and the person rule gives the outcome |
 | `paper/make_*.py` | Every table and figure of the paper and the supplementary analyses (by kind, three verdicts, weighted scores, time-series classifiers, scores by label source, results by land-use class) |
 
 The paper scripts read the reference labels (`data/interim/dossier/legal_vlm/human_truth.csv`, built from the released
