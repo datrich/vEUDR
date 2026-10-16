@@ -40,8 +40,8 @@ evidence (Sentinel-2 sheets and scenes, Landsat, Sentinel-1)  ->  facts (Q1, Q2)
 | `docs/LABELLING.md` | How to organise reference labels for EUDR verification, with the set-up of this study as an example |
 | `docs/DATASET.md` | Description of EUDR-CH (files, columns, pixel geometry, licences) |
 | `examples/` | `quickstart.py` (load, baselines, plot an item), `score_baselines.py` (score baselines against the reference labels) and `make_labelling_batch.py` (draw a labelling batch) |
-| `research_code/` | The pipeline as used for the paper: sampling, evidence, reference sheets, the vision-language model, Whisp |
-| `scripts/build_kaggle.py`, `scripts/build_labels.py` | How the Kaggle release and its anonymised labels were assembled from the study's internal files |
+| `research_code/` | The pipeline as used for the paper: sampling, evidence, reference sheets, the vision-language model, Whisp, scoring, and the scripts of every table and figure (`research_code/paper/`) |
+| `scripts/build_kaggle.py`, `scripts/build_labels.py`, `scripts/label_source.py` | How the Kaggle release and its anonymised labels, with the source of every label, were assembled from the study's internal files |
 | `tests/` | Tests of the legal rule |
 
 The baselines and time-series features in `veudr` reproduce those of the paper exactly on the released data (all

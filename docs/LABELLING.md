@@ -116,6 +116,18 @@ Pre-filling the form with a model's answer saves time but anchors people. If you
 In our study annotators kept the suggested change class on 51 % of assisted items but chose it unseen on 34 % of blind
 items; for land use the difference was 71 % against 67 %, for canopy cover and height none.
 
+
+### Completing the reference with model labels
+
+In this study 975 of the 1303 labels were produced by a multimodal model (Claude Opus 5.5) that followed the same
+guide and saw the same imagery, to complete the batch. If you do this:
+
+- record the source of every label (`label_source` in our release) and never store model labels as if a person had
+  entered them;
+- measure agreement between model and person labels on items labelled by both, and report it next to the agreement
+  between people (ours: kappa 0.76 for forest 2020, 0.51 for the change class, 0.63 for the conclusion, on 44 items);
+- report every result also on the person labels alone.
+
 ## 7. Quality checks per label
 
 Flag, but keep as given: conversion of land that was not forest in 2020; rotation on land that was not a plantation;
